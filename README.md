@@ -8,7 +8,7 @@ Lightweight, typed utilities for JavaScript and React. The main package has no r
 npm install js-validators-and-utils
 ```
 
-Node.js 18 or newer is required. React 17 or newer is an optional peer dependency used only by the React entry.
+Node.js greater than 20 is required. React 17 or newer is an optional peer dependency used only by the React entry.
 
 ## Import
 

@@ -4,7 +4,7 @@ This project follows [Semantic Versioning](https://semver.org/).
 
 ## 2.0.0
 
-The maintained toolkit starts at 2.0.0. Function names and result shapes are the same, and a few behaviors now match the documented contracts. Node.js 18 or newer is required.
+The maintained toolkit starts at 2.0.0. Function names and result shapes are the same, and a few behaviors now match the documented contracts. Node.js greater than 20 is required.
 
 ### Added
 

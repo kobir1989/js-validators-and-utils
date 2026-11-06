@@ -1,6 +1,6 @@
 {
   "name": "js-validators-and-utils",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "description": "A lightweight, tree-shakeable toolkit of TypeScript utilities and validators for JavaScript and React applications.",
   "type": "module",
   "main": "./dist/index.cjs",
@@ -126,7 +126,7 @@
   ],
   "license": "MIT",
   "engines": {
-    "node": ">=18"
+    "node": ">20"
   },
   "publishConfig": {
     "access": "public"
