@@ -1,20 +1,24 @@
 {
   "compilerOptions": {
     "target": "ES2022",
-    "allowJs": true,
-    "skipLibCheck": true,
+    "lib": ["ES2022", "DOM", "DOM.Iterable"],
+    "module": "ESNext",
+    "moduleResolution": "bundler",
     "strict": true,
+    "noUncheckedIndexedAccess": true,
+    "noImplicitOverride": true,
+    "noFallthroughCasesInSwitch": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
     "forceConsistentCasingInFileNames": true,
     "esModuleInterop": true,
-    "module": "esnext",
-    "moduleResolution": "bundler",
-    "resolveJsonModule": true,
+    "skipLibCheck": true,
     "isolatedModules": true,
-    "incremental": false,
-    "outDir": "./dist",
-    "rootDir": "./src",
-    "declaration": true
+    "resolveJsonModule": true,
+    "declaration": true,
+    "noEmit": true,
+    "types": ["jest"]
   },
-  "include": ["src/**/*.ts"],
-  "exclude": ["node_modules"]
+  "include": ["src/**/*.ts", "tsup.config.ts"],
+  "exclude": ["node_modules", "dist"]
 }

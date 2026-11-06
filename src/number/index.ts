@@ -1,0 +1,6 @@
+export { average, sum } from './sum'
+export { clamp } from './clamp'
+export { inRange } from './inRange'
+export { randomInt } from './randomInt'
+export { range } from './range'
+export { roundTo } from './roundTo'

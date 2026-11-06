@@ -1,698 +1,446 @@
 # js-validators-and-utils
 
-![npm version](https://img.shields.io/badge/npm-v1.4.0-blue)
-![License](https://img.shields.io/badge/license-MIT-green)
-![Build Status](https://img.shields.io/travis/ritu1989/js-validators-and-utils)
-![Downloads](https://img.shields.io/npm/dt/js-validators-and-utils)
-![GitHub stars](https://img.shields.io/github/stars/kobir1989/js-validators-and-utils)
-![GitHub forks](https://img.shields.io/github/forks/kobir1989/js-validators-and-utils)
-![GitHub issues](https://img.shields.io/github/issues/kobir1989/js-validators-and-utils)
-![GitHub pull requests](https://img.shields.io/github/issues-pr/kobir1989/js-validators-and-utils)
-![Maintenance](https://img.shields.io/maintenance/yes/2023)
-[![GitHub Dependents](https://img.shields.io/github/dependents/kobir1989/js-validators-and-utils.svg)](https://github.com/kobir1989/js-validators-and-utils/network/dependents)
+Lightweight, typed utilities for JavaScript and React. The main package has no runtime dependencies. React hooks live in a separate entry, so a Node or vanilla project never loads React.
 
+[![npm version](https://img.shields.io/npm/v/js-validators-and-utils.svg)](https://www.npmjs.com/package/js-validators-and-utils)
+[![License](https://img.shields.io/badge/license-MIT-green)](./LICENSE)
 
-## JavaScript Validator and utils Functions - light weight library
+## Install
 
-A lightweight library offering essential JavaScript validation and utility functions. Simplify your code with this versatile npm package.
-
-## Installation and Usage
-
-### To integrate this library:
-
-Install the library with `npm install js-validators-and-utils`
-
-### Tree-Shakeable ES Imports
-
-For seamless integration into your project, employ tree-shakeable ES imports:
-
-```javascript
-import { isStrongPassword } from 'js-validators-and-utils'
+```bash
+npm install js-validators-and-utils
 ```
 
-## Validator functions
+Node.js 18 or newer is required. React 17 or newer is an optional peer dependency used only by the React entry.
 
-Here is a list of the validators functions currently available and how to use them in your code base.
+## Import
 
-### 1. isPasswordMatched()
+The package ships ESM and CommonJS. Bundlers can tree-shake the ESM build. `sideEffects` is `false`.
 
-```javascript
-// Import the necessary function from the library.
-import { isPasswordMatched } from 'js-validators-and-utils'
+```ts
+import { chunkArray, isValidEmail } from 'js-validators-and-utils'
+import { groupBy } from 'js-validators-and-utils/array'
+import { useDebounce } from 'js-validators-and-utils/react'
 
-/**
- * @function isPasswordMatched
- * @param {string} password - The password to compare.
- * @param {string} confirmPassword - The confirmation of the password.
- * @param {number} minLength - The minimum length for the password.
- * @return {Error} - An object indicating the errors.
- */
-
-// Example usage:
-const password = 'mySecretPassword123'
-const confirmPassword = 'mySecretPassword123'
-const minLength = 8
-
-// Call the function with the required arguments.
-const error = isPasswordMatched(password, confirmPassword, minLength)
-
-// Check the error object for validation results.
-if (error.isTooShort) {
-  console.error('Password is too short.') // Handle the error accordingly.
-}
-
-if (!error.isMatched) {
-  // isMatched will be false if booth password are not equal.
-  console.error('Passwords do not match.') // Handle the error accordingly.
-}
-
-// If there are no errors, the passwords are valid and matched.
+const { clamp } = require('js-validators-and-utils')
 ```
 
-### 2. isStrongPassword()
+| Entry                                | What it contains        |
+| ------------------------------------ | ----------------------- |
+| `js-validators-and-utils`            | Every non-React utility |
+| `js-validators-and-utils/array`      | Array helpers           |
+| `js-validators-and-utils/object`     | Object helpers          |
+| `js-validators-and-utils/string`     | String helpers          |
+| `js-validators-and-utils/number`     | Number helpers          |
+| `js-validators-and-utils/date`       | Date helpers            |
+| `js-validators-and-utils/function`   | Function helpers        |
+| `js-validators-and-utils/async`      | Promise helpers         |
+| `js-validators-and-utils/browser`    | Browser helpers         |
+| `js-validators-and-utils/format`     | Display formatting      |
+| `js-validators-and-utils/validators` | Validators              |
+| `js-validators-and-utils/http`       | `fetchWrapper`          |
+| `js-validators-and-utils/react`      | React hooks             |
 
-```javascript
-// Import the necessary function from the library.
-import { isStrongPassword } from 'js-validators-and-utils'
+Category imports stay smaller than the root bundle. The root ESM file is still tree-shakeable, and it does not import React.
 
-/**
- * @function isStrongPassword
- * @param {string} password - The password to check.
- * @param {number} minChars - Minimum number of characters (default is 2).
- * @param {number} minSymbols - Minimum number of symbols (default is 2).
- * @param {number} minNumbers - Minimum number of numbers (default is 2).
- * @return {object}
- */
+TypeScript consumers get declaration files, generics, and the exported result types `PasswordMatchResult`, `PasswordStrength`, `PhoneLocale`, `SluggifyOptions`, `DebouncedFunction`, `FetchOptions`, and `FetchError`.
 
-// Example usage:
-const password = 'MyStrongPassword123!'
-const minChars = 2
-const minSymbols = 2
-const minNumbers = 2
+## Validators
 
-// Call the function with the required arguments (and optional ones if needed).
-const error = isStrongPassword(password, minChars, minSymbols, minNumbers)
+### `isValidEmail(email: string): boolean`
 
-// Check the error object for validation results.
-if (!error.hasChar) {
-  console.error('Password should contain at least 2 characters.') // Handle the error accordingly.
-}
+Returns true for a practical email address. Consecutive dots, surrounding spaces, and a missing domain are rejected.
 
-if (!error.hasSymble) {
-  console.error('Password should contain at least 2 symbols.') // Handle the error accordingly.
-}
-
-if (!error.hasNumber) {
-  console.error('Password should contain at least 2 numbers.') // Handle the error accordingly.
-}
-
-if (!error.hasUppercase) {
-  console.error('Password should contain at least one uppercase letter.') // Handle the error accordingly.
-}
-
-// If there are no errors, the password is considered strong based on the provided criteria.
+```ts
+isValidEmail('user@example.com') // true
+isValidEmail('a..b@example.com') // false
 ```
 
-### 3. isValidDate()
+### `isPasswordMatched(password, confirmPassword, minLength): PasswordMatchResult`
 
-```javascript
-// Import the necessary function from the library.
-import { isValidDate } from 'js-validators-and-utils'
+Compares two strings and reports length separately from equality. Both flags can be true or false together.
 
-/**
- * @function isValidDate
- * @param {string} date - The date string to validate (e.g., "2023-09-05").
- * @returns {boolean}
- */
+```ts
+isPasswordMatched('secret12', 'secret12', 8)
+// { isTooShort: false, isMatched: true }
+```
 
-// Example usage:
-const dateToValidate = '2023-09-05'
+`minLength` must be a finite number.
 
-// Call the function with the date string to validate.
-const isDateValid = isValidDate(dateToValidate)
+### `isStrongPassword(password, minChars = 2, minSymbols = 2, minNumbers = 2): PasswordStrength`
 
-// Check the result to determine if the date is valid.
-if (isDateValid) {
-  console.log('The date is valid.') // Handle the valid date case.
-} else {
-  console.error('Invalid date format. Please provide a valid date string.') // Handle the invalid date case.
+Reports which rules passed. It does not throw for a weak password. The symbol property is spelled `hasSymble` so existing callers keep working. Counted symbols are `$&+,:;=?@#|'<>.^*()%!-`.
+
+```ts
+isStrongPassword('Abc$d@123')
+// { hasChar: true, hasSymble: true, hasNumber: true, hasUppercase: true }
+```
+
+### `isValidURL(url: string): boolean`
+
+Returns true for an absolute `http`, `https`, or `ftp` URL, including ports and `localhost`. This checks syntax, not whether the host is safe to request.
+
+```ts
+isValidURL('https://example.com:3000/docs') // true
+isValidURL('javascript:alert(1)') // false
+```
+
+### `isValidPhoneNumber(phoneNumber: string | number, locale): boolean`
+
+Matches the number against a built-in locale pattern. Unknown locales return false. Pass a string when the number has a leading zero.
+
+```ts
+isValidPhoneNumber('01740000000', 'bn-BD') // true
+isValidPhoneNumber('123-457-8900', 'us-US') // true
+```
+
+`locale` is typed as `PhoneLocale`, so editors can suggest the supported locale codes, and a plain `string` is still accepted.
+
+### `isValidDate(date: string): boolean`
+
+Returns true only for a real `YYYY-MM-DD` calendar day.
+
+```ts
+isValidDate('2024-02-29') // true
+isValidDate('2023-02-29') // false
+```
+
+### `isValidUserName(userName: string, disallowedWords?: string[]): boolean`
+
+Allows 3–20 characters of letters, numbers, and underscores. A disallowed word must match the whole username, ignoring case. `admin123` is allowed when the disallowed word is `admin`.
+
+```ts
+isValidUserName('myUsername', ['admin', 'root']) // true
+isValidUserName('Admin') // false
+```
+
+### `isValidFileExtension(allowedExtensions: string[], fileName: string): boolean`
+
+Compares the final extension, ignoring case. A leading dot in the allow-list is optional. Throws when the allow-list is empty or the file name has no extension.
+
+```ts
+isValidFileExtension(['.PNG', 'jpg'], 'photo.png') // true
+```
+
+### `isEmpty(value: unknown): boolean`
+
+True for `null`, `undefined`, `''`, `[]`, `{}`, and empty maps and sets. `0` and `false` are not empty.
+
+```ts
+isEmpty([]) // true
+isEmpty(0) // false
+```
+
+### `isBlank(value: unknown): boolean`
+
+True when the value is not a string or contains only whitespace.
+
+```ts
+isBlank('   ') // true
+```
+
+### `isNumeric(value: unknown): boolean` and `isInteger(value: unknown): value is number`
+
+`isNumeric` accepts finite numbers and numeric strings. `isInteger` accepts only integer numbers.
+
+```ts
+isNumeric('12.5') // true
+isInteger(3) // true
+isInteger('3') // false
+```
+
+### `isValidJSON(value: string): boolean`
+
+```ts
+isValidJSON('{"ok":true}') // true
+```
+
+### `isHexColor(value: string): boolean`
+
+Accepts `#RGB`, `#RGBA`, `#RRGGBB`, and `#RRGGBBAA`.
+
+```ts
+isHexColor('#1a2b3c') // true
+```
+
+### `isCreditCard(value: string): boolean`
+
+Checks 13–19 digits with the Luhn algorithm. Spaces and dashes are ignored.
+
+```ts
+isCreditCard('4242 4242 4242 4242') // true
+```
+
+## Array
+
+All array helpers return a new array unless a note says otherwise.
+
+| Function                       | Returns               | Example                                                    |
+| ------------------------------ | --------------------- | ---------------------------------------------------------- |
+| `chunkArray(array, size = 1)`  | `T[][]`               | `chunkArray([1, 2, 3, 4, 5], 2)` → `[[1, 2], [3, 4], [5]]` |
+| `flattenArray(array, depth)`   | `T[]`                 | `flattenArray([1, [2, [3]]], 2)` → `[1, 2, 3]`             |
+| `shuffleArray(array, random?)` | `T[]`                 | `shuffleArray([1, 2, 3])`                                  |
+| `unique(array, iteratee?)`     | `T[]`                 | `unique([{ id: 1 }, { id: 1 }], item => item.id)`          |
+| `groupBy(array, iteratee)`     | `Record<string, T[]>` | `groupBy(users, user => user.role)`                        |
+| `sortBy(array, iteratee)`      | `T[]`                 | `sortBy(users, user => user.name)`                         |
+| `partition(array, predicate)`  | `[T[], T[]]`          | `partition([1, 2, 3], n => n % 2 === 0)`                   |
+| `difference(array, ...others)` | `T[]`                 | `difference([1, 2, 3], [2])` → `[1, 3]`                    |
+| `intersection(...arrays)`      | `T[]`                 | `intersection([1, 2], [2, 3])` → `[2]`                     |
+| `compact(array)`               | `T[]`                 | `compact([0, null, 1])` → `[0, 1]`                         |
+
+`flattenArray` returns the same reference when `depth` is `0` or less, and when the array is empty. `chunkArray` throws if `size` is not a positive integer. `sortBy` keeps the original order for equal keys and places `null`, `undefined`, and `NaN` last. `compact` removes only `null` and `undefined`.
+
+```ts
+const pages = chunkArray(rows, 20)
+const [even, odd] = partition(pages[0] ?? [], value => value % 2 === 0)
+```
+
+## Object
+
+| Function                          | Returns           | Example                                       |
+| --------------------------------- | ----------------- | --------------------------------------------- |
+| `deepClone(value)`                | same data type    | `deepClone({ user: { name: 'Ada' } })`        |
+| `deepMerge(a, b, c?)`             | merged object     | `deepMerge({ a: { b: 1 } }, { a: { c: 2 } })` |
+| `isEqual(left, right)`            | `boolean`         | `isEqual({ a: [1] }, { a: [1] })`             |
+| `pick(object, keys)`              | `Pick<T, K>`      | `pick(user, ['id', 'name'])`                  |
+| `omit(object, keys)`              | `Omit<T, K>`      | `omit(user, ['password'])`                    |
+| `getPath(input, path, fallback?)` | `T \| undefined`  | `getPath(user, 'profile.name', 'Guest')`      |
+| `setPath(input, path, value)`     | copy of the input | `setPath(user, 'profile.name', 'Grace')`      |
+
+`deepClone` copies plain objects, arrays, dates, regular expressions, maps, and sets, including cycles. Class instances and functions are returned as-is. `deepMerge` merges nested plain objects, replaces arrays, skips `undefined`, and does not mutate its arguments. `isEqual` treats `NaN` as equal to `NaN` and `0` as equal to `-0`.
+
+```ts
+const next = setPath(state, 'items[1].done', true)
+const name = getPath(next, 'items[1].title', 'Untitled')
+```
+
+## String
+
+| Function                                      | Returns  | Example                                                                |
+| --------------------------------------------- | -------- | ---------------------------------------------------------------------- |
+| `capitalizeString(value)`                     | `string` | `capitalizeString('hello world')` → `'Hello World'`                    |
+| `capitalize(value)`                           | `string` | `capitalize('hELLO')` → `'HELLO'`                                      |
+| `truncatedString(value, start = 0, end = 30)` | `string` | `truncatedString(title)` → a 30-character slice plus `...` when needed |
+| `sluggifiedString(value, options?)`           | `string` | `sluggifiedString('Café Menu!')` → `'cafe-menu'`                       |
+| `camelCase(value)`                            | `string` | `camelCase('hello world')` → `'helloWorld'`                            |
+| `snakeCase(value)`                            | `string` | `snakeCase('helloWorld')` → `'hello_world'`                            |
+| `kebabCase(value)`                            | `string` | `kebabCase('helloWorld')` → `'hello-world'`                            |
+| `wordCount(value)`                            | `number` | `wordCount('one two  three')` → `3`                                    |
+| `escapeHtml(value)`                           | `string` | `escapeHtml('<b>Ada & Grace</b>')`                                     |
+
+`capitalizeString` capitalizes each word and keeps repeated spaces between words. `capitalize` changes only the first character. `sluggifiedString` throws for a blank string. Options are `separator`, `removeStopWords`, `stopWords`, `case` (`'lower' | 'upper' | 'title'`), and `maxLength`.
+
+```ts
+const slug = sluggifiedString('This is a Sample Title', {
+  removeStopWords: true,
+  stopWords: ['is', 'a'],
+  maxLength: 24
+})
+```
+
+## Number
+
+| Function                                   | Returns    | Example                      |
+| ------------------------------------------ | ---------- | ---------------------------- |
+| `clamp(value, min, max)`                   | `number`   | `clamp(12, 0, 10)` → `10`    |
+| `roundTo(value, decimals = 0)`             | `number`   | `roundTo(1.005, 2)` → `1.01` |
+| `inRange(value, min, max)`                 | `boolean`  | `inRange(5, 1, 5)` → `true`  |
+| `randomInt(min, max, random?)`             | `number`   | `randomInt(1, 6)`            |
+| `sum(values)`                              | `number`   | `sum([1, 2, 3])` → `6`       |
+| `average(values)`                          | `number`   | `average([2, 4])` → `3`      |
+| `range(end)` or `range(start, end, step?)` | `number[]` | `range(1, 4)` → `[1, 2, 3]`  |
+
+`range` excludes the end, matching `range(4)` → `[0, 1, 2, 3]`. Bounds are inclusive for `clamp`, `inRange`, and `randomInt`. `average([])` throws.
+
+## Date
+
+Date math uses the local calendar. Invalid calculation inputs throw `Error('Invalid date.')`. Comparison helpers return false for an invalid date instead of throwing.
+
+| Function                                          | Returns   | Example                                                        |
+| ------------------------------------------------- | --------- | -------------------------------------------------------------- |
+| `dateFormatter(date, options?, locale = 'en-US')` | `string`  | `dateFormatter('2023-09-06T14:30:00')` → `'September 6, 2023'` |
+| `formatRelative(date, base = now, locale = 'en')` | `string`  | `formatRelative(yesterday, today)` → `'yesterday'`             |
+| `addDays(date, amount)`                           | `Date`    | `addDays('2024-01-31', 1)`                                     |
+| `addMonths(date, amount)`                         | `Date`    | January 31 plus one month lands on February 28 or 29           |
+| `startOfDay(date)` / `endOfDay(date)`             | `Date`    | local `00:00:00.000` and `23:59:59.999`                        |
+| `isSameDay(left, right)`                          | `boolean` | same local calendar day                                        |
+| `isBefore(left, right)` / `isAfter(left, right)`  | `boolean` | strict time comparison                                         |
+| `diffInDays(from, to)`                            | `number`  | `diffInDays('2024-03-09', '2024-03-11')` → `2`                 |
+
+`dateFormatter('')` returns `''`. An unparseable date returns `'Invalid Date'`. A locale rejected by `Intl` returns `'Invalid Date format'`. `diffInDays` counts calendar days, so a daylight-saving transition does not change the result. `formatRelative` uses `Intl.RelativeTimeFormat`.
+
+```ts
+const due = addDays(startOfDay(new Date()), 7)
+const label = formatRelative(due)
+```
+
+## Function
+
+### `debounce(func, delay = 300)`
+
+Returns a function that calls `func` with the latest arguments and `this` after `delay` quiet milliseconds. The return value has `cancel()` and `flush()`.
+
+```ts
+const save = debounce((value: string) => persist(value), 300)
+input.addEventListener('input', event => {
+  save((event.target as HTMLInputElement).value)
+})
+```
+
+### `throttle(func, wait, options?)`
+
+Calls `func` at most once per window. `options.leading` and `options.trailing` default to `true`. The return value has `cancel()`.
+
+```ts
+const onScroll = throttle(() => updatePosition(), 100)
+```
+
+### `memoize(func, resolver?)`
+
+Caches return values. Primitive arguments get a stable key. Objects use `JSON.stringify` unless you pass a resolver. The function exposes `.cache`.
+
+```ts
+const getUser = memoize(async (id: string) => fetchUser(id))
+```
+
+### `once(func)`
+
+Invokes `func` on the first call and returns that result afterward.
+
+```ts
+const connect = once(() => openDatabase())
+```
+
+### `pipe(...fns)` and `compose(...fns)`
+
+`pipe` runs left to right. `compose` runs right to left. Overloads preserve the types for up to four functions.
+
+```ts
+pipe(
+  (n: number) => n * 2,
+  (n: number) => n + 1
+)(3) // 7
+```
+
+## Async
+
+| Function                                          | Returns         | Example                                       |
+| ------------------------------------------------- | --------------- | --------------------------------------------- |
+| `sleep(ms)`                                       | `Promise<void>` | `await sleep(250)`                            |
+| `withTimeout(promise, ms, message?)`              | `Promise<T>`    | `await withTimeout(fetch(url), 1000)`         |
+| `mapLimit(items, limit, mapper)`                  | `Promise<R[]>`  | `await mapLimit(ids, 3, id => fetchUser(id))` |
+| `retry(operation, maxRetries, delayMs, options?)` | `Promise<T>`    | `await retry(load, 3, 200)`                   |
+
+`retry` makes `maxRetries` total attempts. By default it writes `Attempt N failed: ...` to `console.error`. Pass `{ onError }` to replace that log. `mapLimit` preserves result order and runs at most `limit` mappers at once.
+
+## HTTP
+
+### `fetchWrapper(url: string, options?: FetchOptions): Promise<unknown>`
+
+Fetches JSON when the content type contains `application/json`, and text otherwise. A non-2xx response rejects with `FetchError`, which includes `status`. Network failures reject with the original error.
+
+When `options` is omitted, the request uses `GET` and `Content-Type: application/json`. Options you pass replace that default. They are not merged.
+
+```ts
+try {
+  const post = await fetchWrapper('https://example.com/posts/1')
+} catch (error) {
+  if (error instanceof FetchError) console.error(error.status)
 }
 ```
 
-### 4. isValidEmail()
+## Browser
 
-```javascript
-// Import the necessary function from the 'js-validators-and-utils' package.
-import { isValidEmail } from 'js-validators-and-utils'
+These helpers do nothing harmful during server rendering. `readStorage`, `writeStorage`, and `removeStorage` accept a storage object, which makes them easy to test and lets you pass `sessionStorage`.
 
-/**
- * @function isValidEmail
- * @param {string} email - The email address to validate.
- * @return {boolean}
- */
-
-// Example usage:
-const emailToValidate = 'example@email.com'
-
-// Call the function with the email address to validate.
-const isEmailValid = isValidEmail(emailToValidate)
-
-// Check the result to determine if the email address is valid.
-if (isEmailValid) {
-  console.log('The email address is valid.') // Handle the valid email case.
-} else {
-  console.error('Invalid email format. Please provide a valid email address.') // Handle the invalid email case.
-}
+```ts
+readStorage('theme', 'light')
+writeStorage('theme', { mode: 'dark' })
+parseQuery(location.search) // { page: '2', tag: ['js', 'ts'] }
+stringifyQuery({ page: 2, tag: ['js', 'ts'] }) // 'page=2&tag=js&tag=ts'
+await copyToClipboard(location.href) // false when clipboard access is unavailable
+isBrowser()
 ```
 
-### 5. isValidFileExtension()
+`parseQuery` accepts a query string or a full URL. Repeated keys become arrays. `stringifyQuery` omits `null` and `undefined`.
 
-```javascript
-// Import the necessary functions from the library.
-import { isValidFileExtension } from 'js-validators-and-utils'
+## Format
 
-/**
- * @function isValidFileExtension
- * @param {string[]} allowedExtensions - An array of allowed file extensions (e.g., ['jpg', 'png']).
- * @param {string} fileName - The name of the file to validate.
- * @return {boolean}
- * @throws {Error} - If invalid arguments are provided.
- */
+```ts
+formatNumber(1234.5, 'en-US') // '1,234.5'
+formatCurrency(12.5, 'USD', 'en-US') // '$12.50'
+formatBytes(1536) // '1.5 KB'
+pluralize(1, 'file') // '1 file'
+pluralize(2, 'person', 'people') // '2 people'
+```
 
-// Example usage:
-const allowedExtensions = ['jpg', 'png', 'pdf']
-const fileName = 'document.pdf'
+`formatBytes` uses 1024-based units. `pluralize` applies a small English plural rule and accepts an irregular plural.
 
-// Call the function with the allowedExtensions array and fileName.
-const isFileExtensionValid = isValidFileExtension(allowedExtensions, fileName)
+## React
 
-// Check the result to determine if the file extension is valid.
-if (isFileExtensionValid) {
-  console.log('The file extension is valid.') // Handle the valid file extension case.
-} else {
-  // Handle the invalid file extension case.
-  console.error(
-    'Invalid file extension. Please provide a valid file extensions.'
+Import hooks from the React entry inside a client component. The core package does not depend on React.
+
+```tsx
+import {
+  useDebounce,
+  useLocalStorage,
+  useToggle
+} from 'js-validators-and-utils/react'
+
+function SearchBox() {
+  const [query, setQuery] = useLocalStorage('query', '')
+  const debounced = useDebounce(query, 300)
+  const [open, toggle] = useToggle(false)
+
+  return (
+    <input value={query} onChange={event => setQuery(event.target.value)} />
   )
 }
 ```
 
-### 6. isValidPhoneNumber()
+| Hook                                        | Returns                     | Notes                                                                                      |
+| ------------------------------------------- | --------------------------- | ------------------------------------------------------------------------------------------ |
+| `useDebounce(value, delay = 300)`           | `T`                         | The first render returns `value` immediately.                                              |
+| `useToggle(initial = false)`                | `[value, toggle, setValue]` | `toggle` flips the boolean.                                                                |
+| `usePrevious(value)`                        | `T \| undefined`            | `undefined` on the first render.                                                           |
+| `useIsMounted()`                            | `() => boolean`             | Check it after an async call before setting state.                                         |
+| `useLocalStorage(key, initialValue)`        | `[value, setValue, remove]` | Reads storage after mount so server HTML can use `initialValue`. Values must be JSON data. |
+| `useMediaQuery(query)`                      | `boolean`                   | `false` when `matchMedia` is unavailable.                                                  |
+| `useClickOutside(ref, handler)`             | `void`                      | Pointer events outside the element call `handler`.                                         |
+| `useClipboard(resetAfter = 2000)`           | `{ copied, error, copy }`   | `copied` returns to false after the timeout.                                               |
+| `useEventListener(event, handler, target?)` | `void`                      | Defaults to `window`. `null` skips the subscription. The latest handler is always called.  |
 
-```javascript
-// Import the necessary functions and data from the library.
-import { isValidPhoneNumber } from 'js-validators-and-utils'
+## Scripts
 
-/**
- * @function isValidPhoneNumber
- * @param {string | number} phoneNumber - The phone number to validate.
- * @param {string} locale - The locale to apply phone number validation rules. (e.g., 'bn-BD', 'en-US')
- * @returns {boolean}
- */
-
-// Example usage:
-const phoneNumberToValidate = '01740000000' // Replace with the phone number you want to validate.
-const locale = 'bn-BD' // Replace with the desired locale.
-
-// Call the function with the phone number and locale.
-const isPhoneNumberValid = isValidPhoneNumber(phoneNumberToValidate, locale)
-
-// Check the result to determine if the phone number is valid.
-if (isPhoneNumberValid) {
-  console.log('The phone number is valid.') // Handle the valid phone number case.
-} else {
-  // Handle the invalid phone number case.
-  console.error(
-    'Invalid phone number format. Please provide a valid phone number'
-  )
-}
+```bash
+npm test              # unit tests
+npm run test:coverage # tests with coverage gates
+npm run lint
+npm run typecheck
+npm run build         # ESM, CommonJS, and declaration files
+npm run check:consumer
+npm run smoke
 ```
 
-### 7. isValidUrl()
+Coverage gates are 95% statements, 90% branches, 97% lines, and 100% functions. Hooks and browser code are included.
 
-```javascript
-// Import the necessary functions from the library.
-import { isValidURL } from 'js-validators-and-utils'
+## Versioning and releases
 
-/**
- * @function isValidURL
- * @param {string} url - The URL to validate.
- * @return {boolean}
- */
+Versions follow SemVer. The public contract is the root exports and the category exports above. Internal file paths can change.
 
-// Example usage:
-const validURL = 'https://www.example.com' // Replace the URL you want to validate.
+1. Update `CHANGELOG.md`.
+2. Bump `version` in `package.json`: patch for a fix, minor for a compatible addition, major for a breaking change.
+3. Use a conventional commit such as `feat:`, `fix:`, or `docs:`. Commitlint checks the message.
+4. Tag the release, for example `v2.0.0`, and push the tag.
 
-// Call the function with the URL you want to validate
-const isURLValid = isValidURL(validURL)
+The release workflow runs the tests and build, then publishes to npm with provenance. The repository secret `NPM_TOKEN` must be an automation token with permission to publish this package.
 
-// Check the result to determine if the URL is valid.
-if (isURLValid) {
-  console.log('The URL is valid.') // Handle the valid URL case
-} else {
-  console.log('The URL is not valid.') // This will not be executed for a valid URL
-}
-```
-
-### 8. isValidUserName()
-
-```javascript
-// Import the necessary functions from the library.
-import { isValidUserName } from 'js-validators-and-utils'
-
-/**
- * @function isValidUserName
- * @param {string} userName - The username to validate.
- * @param {Array} disallowedWords - An array of disallowed words (e.g., reserved words, offensive content).
- * @return {boolean}
- */
-
-// Example usage:
-const validUserName = 'myUsername123' // Replace with a valid username.
-const disallowedWords = ['admin', 'root', 'password'] // List of disallowed words.
-
-// Call the function with the valid username and disallowed words list
-const isUserNameValid = isValidUserName(validUserName, disallowedWords)
-
-// Check the result to determine if the username is valid.
-if (isUserNameValid) {
-  console.log('The username is valid.') // Handle the valid username case
-} else {
-  console.log('The username is not valid.') // This will not be executed for a valid username
-}
-```
-
-## Util function / Helper functions
-
-Here is a list of the Util functions / Helper functions currently available and how to use them in your code base.
-
-### 1. fetchWrapper() - HTTP Request Helper
-
-```javascript
-// Import the necessary functions from the library.
-import { fetchWrapper } from 'js-validators-and-utils'
-
-/**
- * @function fetchWrapper
- * @param {string} url - The URL for the fetch request.
- * @param {object} options - Optional fetch options (e.g., method, headers, body).
- * @returns {Promise<unknown>} - A Promise that resolves to the fetched data or rejects with an error.
- */
-
-// Example use case:
-const apiUrl = 'https://jsonplaceholder.typicode.com/posts/1' // Replace with the API URL you want to fetch.
-
-// Optional: Define fetch options (these are the default options used in this example).
-const fetchOptions = {
-  method: 'GET', // HTTP method (default is GET)
-  headers: {
-    'Content-Type': 'application/json' // Request headers
-  }
-}
-
-try {
-  // Call the function with the API URL and optional fetch options.
-  const responseData = await fetchWrapper(apiUrl, fetchOptions)
-
-  // Print the fetched data
-  console.log('Fetched Data:', responseData)
-} catch (error) {
-  console.error('Error:', error.message) // Handle any potential errors
-}
-```
-
-### 2. capitalizeString() - String manipulation
-
-```javascript
-// Import the necessary functions from the library.
-import { capitalizeString } from 'js-validators-and-utils'
-
-/**
- * @function capitalizeString
- * @param {string}
- * @return {capitalized string}
- * @throws {Error}
- */
-
-// Example use case:
-const inputString = 'hello world' // Replace with the string you want to capitalize.
-
-// Call the function with the input string
-const capitalizedString = capitalizeString(inputString)
-
-// Print the capitalized string
-console.log('Capitalized String:', capitalizedString) // output 'Hello World';
-```
-
-### 3. dateFormatter() - String manipulation
-
-```javascript
-// Import the necessary functions from the library.
-import { dateFormatter } from 'js-validators-and-utils'
-
-/**
- * @function dateFormatter
- * @param {date}
- * @param {options} - object
- * @param {locale}
- * @throws {Error}
- * @return {formatted date string}
- */
-
-// Example use case:
-const inputDate = '2023-09-08T12:00:00Z' // Replace with the date string you want to format.
-
-// Optional: Define formatting options and locale (these are the default options used in this example).
-const formattingOptions = {
-  year: 'numeric',
-  month: 'long',
-  day: 'numeric'
-}
-
-const locale = 'en-US'
-// Call the function with the input date and optional formatting options and locale.
-const formattedDate = dateFormatter(inputDate, formattingOptions, locale)
-
-// Print the formatted date
-console.log('Formatted Date:', formattedDate) // output September 6, 2023
-```
-
-### 4. sluggifiedString() - String manipulation
-
-```javascript
-// Import the necessary functions from the library.
-import { sluggifiedString } from 'js-validators-and-utils'
-
-/**
- * @function sluggifiedString
- * @param {string}
- * @param {options} - options object {}
- * @return {sluggified string}
- * @throws {Error}
- */
-
-// Example output for the given sluggifyOptions and input string
-const inputString = 'This is a Sample Title'
-
-const sluggifyOptions = {
-  separator: '-', // Separator between words (default is hyphen)
-  removeStopWords: true, // Remove common stop words (default is true)
-  stopWords: ['is', 'a'], // List of stop words to remove
-  case: 'lower', // Case transformation (default is lowercase)
-  maxLength: 20 // Maximum length of the slug (default is unlimited)
-}
-
-// Call the function with the input string and sluggify options.
-const sluggified = sluggifiedString(inputString, sluggifyOptions)
-
-// Output
-console.log('Original String:', inputString)
-console.log('Sluggified String:', sluggified)
-
-/* Output:
-Original String: This is a Sample Title
-Sluggified String: this-sample-title
-*/
-```
-
-### 5. truncatedString() - String manipulation
-
-```javascript
-// Import the necessary functions from the library.
-import { truncatedString } from 'js-validators-and-utils'
-
-/**
- * @function truncatedString
- * @param {string}
- * @param {start}
- * @param {end}
- * @return {truncated string}
- * @throws {error}
- */
-
-// Example use case:
-const inputString = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.'
-
-// Optional: Define start and end positions for truncation (these are the default values used in this example).
-const startPosition = 0 // Start position for truncation (default is 0)
-const endPosition = 30 // End position for truncation (default is 30)
-
-// Call the function with the input string and optional start and end positions.
-const truncated = truncatedString(inputString, startPosition, endPosition)
-
-// Print the truncated string
-console.log('Original String:', inputString)
-console.log('Truncated String:', truncated) // Expected Output: Lorem ipsum dolor sit amet...
-```
-
-### 6. debounce() - function is used to delay the execution of the Operation
-
-```javascript
-// Import the necessary function from the library.
-import { debounce } from 'js-validators-and-utils'
-
-/**
- * @function debounce
- * @param {function} func - The function to be debounced.
- * @param {number} delay - Delay time in milliseconds.
- * @returns {function} - A debounced function.
- */
-
-// Simulated API request function
-const fetchSearchResults = query => {
-  // Simulate an API request and log the results
-  console.log(`Fetching results for query: ${query}`)
-}
-
-// Get the search input element from the DOM
-const searchInput = document.getElementById('search-input')
-
-// Function to handle user input and trigger API request
-const handleSearchInput = event => {
-  const query = event.target.value
-
-  // Use debounce to delay the API request by 500 milliseconds
-  debounce(() => {
-    fetchSearchResults(query)
-  }, 500)()
-}
-
-// Attach the event listener to the search input
-searchInput.addEventListener('input', handleSearchInput)
-```
-
-### 7. retry() - function is used to retry the asyncOperation function <br> up to maxRetries times with a delay of delayMs milliseconds between each retry.
-
-```javascript
-// Import the necessary function from the library.
-import { retry } from 'js-validators-and-utils'
-
-/**
- * @function retry
- * @param {function} operation - The async operation to retry.
- * @param {number} maxRetries - The maximum number of retry attempts.
- * @param {number} delayMs - The delay in ms between retry attempts.
- * @throws {Error} - Throws an error if the operation fails after all retries.
- * @return {Promise} - Resolves when the operation succeeds or rejects if it fails after all retries.
- */
-
-// Example use case:
-const maxRetries = 3 // Maximum number of retry attempts.
-const delayMs = 1000 // Delay in milliseconds between retry attempts.
-
-const asyncOperation = async () => {
-  // Simulate a network request that sometimes fails.
-  const shouldFail = Math.random() < 0.5 // 50% chance of failure.
-  if (shouldFail) {
-    throw new Error('Network request failed.')
-  } else {
-    return 'Success! Data received.'
-  }
-}
-
-try {
-  // Call the function to retry the async operation with the specified maxRetries and delayMs.
-  const result = await retry(asyncOperation, maxRetries, delayMs)
-
-  // Print the result if the operation succeeds.
-  console.log('Operation succeeded:', result)
-} catch (error) {
-  console.error('Error:', error.message) // Handle the error if the operation fails after all retries.
-}
-```
-
-### 8. chunkArray() - Array manipulation
-
-```javascript
-// Import the necessary function from the library.
-import { chunkArray } from 'js-validators-and-utils'
-
-/**
- * @function chunkArray
- * @param {array}
- * @param {size}
- * @throws {Error}
- * @return {new Array}
- */
-
-// Example use case:
-const inputArray = [1, 2, 3, 4, 5, 6, 7, 8, 9] // Replace with the array you want to create chunk.
-
-const chunkSize = 3 // Define the size of each chunk.
-
-// Call the function to chunk the input array into chunks of the specified size.
-const result = chunkArray(inputArray, chunkSize)
-
-// Print the chunked array
-console.log('Original Array:', inputArray)
-console.log(`Array Chunked into ${chunkSize}-sized Chunks:`, result)
-// Output
-// Original Array: [1, 2, 3, 4, 5, 6, 7, 8, 9]
-// Array Chunked into 3-sized Chunks: [[1, 2, 3], [4, 5, 6], [7, 8, 9]]
-```
-
-### 9. flattenArray() - Array manipulation Recursive function
-
-```javascript
-// Import the necessary function from the library.
-import { flattenArray } from 'js-validators-and-utils'
-
-/**
- * @function flattenArray
- * @param {array}
- * @param {depth}
- * @throws {Error}
- * @return {Flat Array}
- */
-
-// Example use case:
-const nestedArray = [1, [2, [3, [4]], 5], 6] // Replace with the nested array you want to flatten.
-
-const flattenDepth = 2 // Define the depth to which you want to flatten the array.
-
-// Call the function to flatten the nested array up to the specified depth.
-const result = flattenArray(nestedArray, flattenDepth)
-
-// Print the flattened array
-console.log('Nested Array:', nestedArray)
-console.log(`Flattened Array (Depth ${flattenDepth}):`, result)
-// Output
-// Nested Array: [1, [2, [3, [4]], 5], 6]
-// Flattened Array (Depth 2): [1, 2, 3, [4], 5, 6]
-```
-
-### 10. shuffleArray() - Array manipulation
-
-```javascript
-// Import the necessary function from the library.
-import { shuffleArray } from 'js-validators-and-utils'
-
-/**
- * @function shuffleArray
- * @param {array}
- * @throws {Error}
- * @return {array}
- */
-
-// Example use case:
-const inputArray = [1, 2, 3, 4, 5] // Replace with the array you want to shuffle.
-
-// Call the function to shuffle the input array.
-const shuffledArray = shuffleArray(inputArray)
-
-// Print the shuffled array
-console.log('Original Array:', inputArray)
-console.log('Shuffled Array:', shuffledArray)
-
-// Output
-// Original Array: [1, 2, 3, 4, 5]
-// Shuffled Array: [3, 2, 5, 1, 4] // The order will be different each time you run it.
-```
-
-# How to Contribute to `js-validators-and-utils`
-
-Thank you for considering contributing to `js-validators-and-utils` I welcome your contributions and have outlined the following steps to help you get started.
-
-## Prerequisites
-
-Before you start contributing, make sure you have the following installed on your system:
-
-- [Node.js](https://nodejs.org/): - (v18.17.1) To run JavaScript/TypeScript code and manage dependencies using npm.
-- [Git](https://git-scm.com/): To clone the repository and create branches for your contributions.
-
-## Fork the Repository
-
-[GitHub repository](https://github.com/kobir1989/js-validators-and-utils)
-
-## Clone the Repository
-
-Open your terminal and run the following command to clone the repository to your local machine.
+## Contributing
 
 ```bash
 git clone git@github.com:kobir1989/js-validators-and-utils.git
-```
-
-### Install Dependencies
-
-Navigate to the project directory and install the project dependencies:
-
-```bash
 cd js-validators-and-utils
 npm install
 ```
 
-### Create a Branch
-
-```bash
-git checkout -b feature/add-new-functionality
-```
-
-### Make Changes
-
-Make your desired changes or improvements to the library code. Ensure that your code follows the project's coding style and guidelines.
-
-### Code Formatting and Linting
-
-I have used Prettier and ESLint to maintain code consistency. Before committing your changes, run the following commands to format and lint your code:
-
-```bash
-npm run prettier   # Format code with Prettier
-npm run lint     # Lint code with ESLint
-```
-
-### Test Your Changes
-
-Before submitting a pull request, it's crucial to test your changes thoroughly. Run any provided tests and create new ones if necessary.<br> Make sure that the existing tests pass and that your new code doesn't introduce any regressions.
-
-```bash
-#Test command
-npm run test
-```
-
-### Commit Your Changes
-
-Once your changes are complete and tested, commit your changes with a clear and concise commit message:
-
-```bash
-git commit -m "feat: description of your changes"
-```
-
-### Push Your Changes
-
-Push your changes to your forked repository on GitHub:
-
-```bash
-git push -u origin feature/add-new-functionality
-```
-
-### Create a Pull Request
-
-Provide a detailed description of your changes in the pull request.
-
-### Merge Your Pull Request
-
-Once your pull request is approved, it will be merged into the main project. Congratulations, you've successfully contributed to `js-validators-and-utils`!
-
-### Thank You
-
-Thank you for your contribution to `js-validators-and-utils`! Your efforts help improve the library.
+Add the utility in the matching category, export it from that category and from `src/index.ts` when it is not React-specific, and cover normal input, invalid input, and errors. Run `npm test` and `npm run lint` before opening a pull request. The pre-commit hook typechecks and lints. React hooks stay in `src/react` and out of the root entry.

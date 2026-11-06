@@ -1,0 +1,7 @@
+export { deepClone } from './deepClone'
+export { deepMerge } from './deepMerge'
+export { getPath } from './getPath'
+export { isEqual } from './isEqual'
+export { omit } from './omit'
+export { pick } from './pick'
+export { setPath } from './setPath'

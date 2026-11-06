@@ -1,19 +1,107 @@
 {
   "name": "js-validators-and-utils",
-  "version": "1.4.0",
-  "description": "A versatile toolkit of utility functions and validators for simplifying data validation and common tasks in JavaScript applications.",
-  "main": "dist/index.js",
-  "types": "dist/index.d.ts",
-  "homepage": "https://github.com/kobir1989/validator-library",
-  "repository": "https://github.com/kobir1989/validator-library",
+  "version": "2.0.0",
+  "description": "A lightweight, tree-shakeable toolkit of TypeScript utilities and validators for JavaScript and React applications.",
+  "type": "module",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "sideEffects": false,
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE",
+    "CHANGELOG.md"
+  ],
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    },
+    "./array": {
+      "types": "./dist/array.d.ts",
+      "import": "./dist/array.js",
+      "require": "./dist/array.cjs"
+    },
+    "./object": {
+      "types": "./dist/object.d.ts",
+      "import": "./dist/object.js",
+      "require": "./dist/object.cjs"
+    },
+    "./string": {
+      "types": "./dist/string.d.ts",
+      "import": "./dist/string.js",
+      "require": "./dist/string.cjs"
+    },
+    "./number": {
+      "types": "./dist/number.d.ts",
+      "import": "./dist/number.js",
+      "require": "./dist/number.cjs"
+    },
+    "./date": {
+      "types": "./dist/date.d.ts",
+      "import": "./dist/date.js",
+      "require": "./dist/date.cjs"
+    },
+    "./function": {
+      "types": "./dist/function.d.ts",
+      "import": "./dist/function.js",
+      "require": "./dist/function.cjs"
+    },
+    "./async": {
+      "types": "./dist/async.d.ts",
+      "import": "./dist/async.js",
+      "require": "./dist/async.cjs"
+    },
+    "./browser": {
+      "types": "./dist/browser.d.ts",
+      "import": "./dist/browser.js",
+      "require": "./dist/browser.cjs"
+    },
+    "./format": {
+      "types": "./dist/format.d.ts",
+      "import": "./dist/format.js",
+      "require": "./dist/format.cjs"
+    },
+    "./validators": {
+      "types": "./dist/validators.d.ts",
+      "import": "./dist/validators.js",
+      "require": "./dist/validators.cjs"
+    },
+    "./http": {
+      "types": "./dist/http.d.ts",
+      "import": "./dist/http.js",
+      "require": "./dist/http.cjs"
+    },
+    "./react": {
+      "types": "./dist/react.d.ts",
+      "import": "./dist/react.js",
+      "require": "./dist/react.cjs"
+    },
+    "./package.json": "./package.json"
+  },
+  "homepage": "https://github.com/kobir1989/js-validators-and-utils#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kobir1989/js-validators-and-utils.git"
+  },
+  "bugs": {
+    "url": "https://github.com/kobir1989/js-validators-and-utils/issues"
+  },
   "scripts": {
     "test": "jest",
-    "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
-    "build": "tsc",
-    "prettier": "prettier --write .",
-    "prepare": "husky install",
-    "fix-all": "npm run lint -- --fix && git add -A . && npm run prettier",
-    "pre-push": "npm run build && [ $? -eq 0 ] || exit 1"
+    "test:coverage": "jest --coverage",
+    "lint": "eslint . --ext ts --report-unused-disable-directives --max-warnings 0",
+    "lint:fix": "eslint . --ext ts --fix",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "build": "tsup",
+    "check:consumer": "tsc -p tsconfig.consumer.json --noEmit",
+    "smoke": "node scripts/smoke.mjs && node scripts/smoke.cjs",
+    "prepublishOnly": "npm run lint && npm run typecheck && npm run test:coverage && npm run build && npm run check:consumer && npm run smoke",
+    "prepare": "husky install"
   },
   "author": "Kabir Hossain",
   "contributors": [
@@ -23,43 +111,54 @@
     "validator",
     "validation",
     "validate",
-    "sanitise",
-    "assert",
+    "typescript",
     "util",
     "utility",
     "helper functions",
-    "util functions",
     "data validation",
     "input validation",
-    "data sanitization",
     "form validation",
-    "JavaScript utilities",
-    "common tasks",
-    "validation tools",
-    "validation functions"
+    "javascript utilities",
+    "react hooks",
+    "tree-shakeable",
+    "debounce",
+    "throttle"
   ],
   "license": "MIT",
+  "engines": {
+    "node": ">=18"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "peerDependencies": {
+    "react": ">=17"
+  },
+  "peerDependenciesMeta": {
+    "react": {
+      "optional": true
+    }
+  },
   "devDependencies": {
     "@commitlint/cli": "^17.7.1",
     "@commitlint/config-conventional": "^17.7.0",
+    "@testing-library/react": "^16.1.0",
     "@types/jest": "^29.5.4",
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0",
     "@typescript-eslint/eslint-plugin": "^6.5.0",
     "@typescript-eslint/parser": "^6.5.0",
     "eslint": "^8.48.0",
-    "eslint-config-airbnb-base": "^15.0.0",
     "eslint-config-prettier": "^9.0.0",
     "eslint-plugin-prettier": "^5.0.0",
     "husky": "^8.0.0",
+    "jest": "^29.7.0",
+    "jest-environment-jsdom": "^29.7.0",
     "prettier": "^3.0.3",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
     "ts-jest": "^29.1.1",
+    "tsup": "^8.3.5",
     "typescript": "^5.2.2"
-  },
-  "engines": {
-    "node": ">= 0.10"
-  },
-  "husky": {
-    "hooks": {
-      "pre-commit": "lint-staged"
-    }
   }
 }
