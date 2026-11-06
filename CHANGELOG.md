@@ -2,9 +2,13 @@
 
 This project follows [Semantic Versioning](https://semver.org/).
 
+## 2.0.1
+
+Require Node.js greater than 20. Continuous integration now runs on Node.js 22 and 24.
+
 ## 2.0.0
 
-The maintained toolkit starts at 2.0.0. Function names and result shapes are the same, and a few behaviors now match the documented contracts. Node.js greater than 20 is required.
+The maintained toolkit starts at 2.0.0. Function names and result shapes are the same, and a few behaviors now match the documented contracts. Node.js 18 or newer is required.
 
 ### Added
 
