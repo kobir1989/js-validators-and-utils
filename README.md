@@ -2,9 +2,6 @@
 
 Lightweight, typed utilities for JavaScript and React. The main package has no runtime dependencies. React hooks live in a separate entry, so a Node or vanilla project never loads React.
 
-[![npm version](https://img.shields.io/npm/v/js-validators-and-utils.svg)](https://www.npmjs.com/package/js-validators-and-utils)
-[![License](https://img.shields.io/badge/license-MIT-green)](./LICENSE)
-
 ## Install
 
 ```bash
